@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -26,12 +27,19 @@ namespace MyLocalizedApp.Api.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            var cultureInfo = HttpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture?.Culture;
+            var regionInfo = new RegionInfo(cultureInfo.LCID);
+
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
+            return Enumerable.Range(1, 5).Select(index => {
+                var temp = rng.Next(-20, 55);
+                return new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    Temperature = regionInfo.IsMetric ? temp : (int)(temp / 0.5556),
+                    TemperatureUnit = regionInfo.IsMetric ? "C" : "F",
+                    Summary = Summaries[rng.Next(Summaries.Length)]
+                };
             })
             .ToArray();
         }

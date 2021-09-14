@@ -26,7 +26,6 @@ namespace MyLocalizedApp.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -43,6 +42,17 @@ namespace MyLocalizedApp.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyLocalizedApp.Api v1"));
             }
+
+            var supportedCultures = new[] { "en-US", "pt-BR", "fr-FR", "ar", "en-ZA","nso-ZA", "tn-ZA", "st-ZA", "nr-ZA","ss-ZA", "ts-ZA", "ve-ZA", "xh-ZA", "zu-ZA" };
+            app.UseRequestLocalization(options =>{
+                options = options
+                    .AddSupportedCultures(supportedCultures)
+                    .AddSupportedUICultures(supportedCultures)
+                    .SetDefaultCulture(supportedCultures[0]);
+                options.FallBackToParentCultures = true;
+                options.FallBackToParentUICultures = true;
+                options.ApplyCurrentCultureToResponseHeaders = true;
+            });
 
             app.UseHttpsRedirection();
 
